@@ -297,12 +297,12 @@ namespace HumaneSociety
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
             IQueryable<AnimalShot> animalshots = db.AnimalShots;
             animalshots = animalshots.Where(a => a.AnimalId == animal.AnimalId);
-            foreach (AnimalShot animalShot in animalshots)
+            for (int i = 1; i < animalshots.Count() + 1; i++)
             {
                 AnimalShot animalShotInstance = new AnimalShot();
                 animalShotInstance = (from x in db.AnimalShots
-                                      where x.ShotId == animalShot.AnimalId
-                                      select x).First();
+                                      where x.ShotId == i
+                                      select x).Single();
                 animalShotInstance.DateReceived = DateTime.Now;
                 db.SubmitChanges();
             }
@@ -345,6 +345,13 @@ namespace HumaneSociety
                 case "read":
                     break;
                 case "update":
+                    Employee employeeToUpdate = new Employee();
+                    employeeToUpdate = (from e in db.Employees
+                                        where e.EmployeeNumber == employee.EmployeeNumber
+                                        select e).Single();
+                    employeeToUpdate.FirstName = employee.FirstName;
+                    employeeToUpdate.LastName = employee.LastName;
+                    employeeToUpdate.Email = employee.Email;
                     break;
                 case "delete":
                     var employeeToDelete = db.Employees.Where(e => e.LastName == employee.LastName).Single();
