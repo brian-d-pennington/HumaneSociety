@@ -167,5 +167,19 @@ namespace HumaneSociety
 
             return db.Categories.Where(c => c.Name == species).Select(c => c.CategoryId).Single();
         }
+
+        internal static int GetDietPlanId(string dietPlan)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+
+            return db.DietPlans.Where(d => d.Name == dietPlan).Select(d => d.DietPlanId).Single();
+        }
+
+        internal static void AddAnimal(Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+
+            db.Animals.InsertOnSubmit(animal);
+        }
     }
 }
