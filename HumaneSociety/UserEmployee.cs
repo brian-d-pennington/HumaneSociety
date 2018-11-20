@@ -97,7 +97,7 @@ namespace HumaneSociety
         private void CheckAnimalStatus()
         {
             Console.Clear();            
-            var animals = Query.SearchForAnimalByMultipleTraits().ToList();
+            var animals = Query.SearchForAnimalByMultipleTraits(UserInterface.GetAnimalCriteria()).ToList();
             if(animals.Count > 1)
             {
                 UserInterface.DisplayUserOptions("Several animals found");
@@ -173,9 +173,9 @@ namespace HumaneSociety
             }
             else
             {
-                if (UserInterface.GetBitData("Would you like to Update shots?"))
+                if (UserInterface.GetBitData("Would you like to give shots?"))
                 {
-                    Query.UpdateShot("booster", animal);
+                    Query.GiveShot(animal);
                 }
             }
             
@@ -192,7 +192,7 @@ namespace HumaneSociety
             string input = UserInterface.GetUserInput();
             if(input.ToLower() == "9" ||input.ToLower() == "finished")
             {
-                Query.EnterAnimalUpdate(animal, updates);
+                //Query.EnterAnimalUpdate(animal, updates);
             }
             else
             {

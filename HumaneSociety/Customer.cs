@@ -92,7 +92,7 @@ namespace HumaneSociety
         private void RunSearch()
         {
             Console.Clear();            
-            var animals = Query.SearchForAnimalByMultipleTraits().ToList();
+            var animals = Query.SearchForAnimalByMultipleTraits(UserInterface.GetAnimalCriteria()).ToList();
             if (animals.Count > 1)
             {
                 UserInterface.DisplayUserOptions("Several animals found");
@@ -167,13 +167,13 @@ namespace HumaneSociety
             {
                 try
                 {
-                    var stateReturn = from territory in states where territory.Name.ToLower() == state.ToLower() select territory.ID;
+                    var stateReturn = from territory in states where territory.Name.ToLower() == state.ToLower() select territory.USStateId;
                     int stateNumber = stateReturn.ToList()[0];
                     return stateNumber;
                 }
                 catch
                 {
-                    var stateReturn = from territory in states where territory.Abbreviation == state.ToUpper() select territory.ID;
+                    var stateReturn = from territory in states where territory.Abbreviation == state.ToUpper() select territory.USStateId;
                     int stateNumber = stateReturn.ToList()[0];
                     return stateNumber;
                 }

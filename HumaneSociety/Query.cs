@@ -94,7 +94,7 @@ namespace HumaneSociety
             Address updatedAddress = db.Addresses.Where(a => a.AddressLine1 == clientAddress.AddressLine1 && a.USStateId == clientAddress.USStateId && a.Zipcode == clientAddress.Zipcode).FirstOrDefault();
 
             // if the address isn't found in the Db, create and insert it
-            if(updatedAddress == null)
+            if (updatedAddress == null)
             {
                 Address newAddress = new Address();
                 newAddress.AddressLine1 = clientAddress.AddressLine1;
@@ -110,7 +110,7 @@ namespace HumaneSociety
 
             // attach AddressId to clientFromDb.AddressId
             clientFromDb.AddressId = updatedAddress.AddressId;
-            
+
             // submit changes
             db.SubmitChanges();
         }
@@ -121,14 +121,14 @@ namespace HumaneSociety
 
             Employee employeeFromDb = db.Employees.Where(e => e.Email == email && e.EmployeeNumber == employeeNumber).FirstOrDefault();
 
-            if(employeeFromDb == null)
+            if (employeeFromDb == null)
             {
-                throw new NullReferenceException();            
+                throw new NullReferenceException();
             }
             else
             {
                 return employeeFromDb;
-            }            
+            }
         }
 
         internal static Employee EmployeeLogin(string userName, string password)
@@ -275,6 +275,42 @@ namespace HumaneSociety
                         select x).First();
             adoption.ApprovalStatus = status;
             db.SubmitChanges();
+        }
+        internal static void GiveShot(Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<Shot> shots = db.Shots;
+            //shots = shots.Where(s => s.CategoryId == animal.CategoryId);
+            shots.ToList();
+            foreach (Shot shot in shots)
+            {
+                AnimalShot animalShot = new AnimalShot();
+                animalShot.ShotId = shot.ShotId;
+                animalShot.AnimalId = animal.AnimalId;
+                animalShot.DateReceived = DateTime.Now;
+                db.AnimalShots.InsertOnSubmit(animalShot);
+                db.SubmitChanges();
+            }
+        }
+        internal static void UpdateShot(string booster, Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<AnimalShot> animalshots = db.AnimalShots;
+            animalshots = animalshots.Where(a => a.AnimalId == animal.AnimalId);
+            foreach (AnimalShot animalShot in animalshots)
+            {
+                AnimalShot animalShotInstance = new AnimalShot();
+                animalShotInstance = (from x in db.AnimalShots
+                                      where x.ShotId == animalShot.AnimalId
+                                      select x).First();
+                animalShotInstance.DateReceived = DateTime.Now;
+                db.SubmitChanges();
+            }
+        }
+        internal static Animal GetAnimalByID(int ID)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            return db.Animals.Where(a => a.AnimalId == ID).Single();
         }
     }
 }
