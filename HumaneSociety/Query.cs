@@ -160,5 +160,12 @@ namespace HumaneSociety
 
             db.SubmitChanges();
         }
+
+        internal static int GetCategoryId(string species)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+
+            return db.Categories.Where(c => c.Name == species).Select(c => c.CategoryId).Single();
+        }
     }
 }
