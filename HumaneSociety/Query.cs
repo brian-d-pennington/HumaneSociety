@@ -362,5 +362,55 @@ namespace HumaneSociety
                     break;
             }
         }
+        internal static void EnterAnimalUpdate(Animal animal, Dictionary<int, string> updateDict)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Animal animalToUpdate = new Animal();
+            animalToUpdate = (from a in db.Animals
+                              where a.AnimalId == animal.AnimalId
+                              select a).Single();
+
+            foreach (KeyValuePair<int,string> update in updateDict)
+            {
+                if (update.Key == 1)
+                {
+                    int categoryId = GetCategoryId(update.Value);
+                    animalToUpdate.CategoryId = categoryId;
+                }else if (update.Key == 2)
+                {
+                    animalToUpdate.Name = update.Value;
+                }
+                else if (update.Key == 3)
+                {
+                    int age = Convert.ToInt32(update.Value);
+                    animalToUpdate.Age = age;
+                }
+                else if (update.Key == 4)
+                {
+                    animalToUpdate.Demeanor = update.Value;
+                }
+                else if (update.Key == 5)
+                {
+                    bool kidFriendly = update.Value == "True" ? true : false;
+                    animalToUpdate.KidFriendly = kidFriendly;
+                }
+                else if (update.Key == 6)
+                {
+                    bool petFriendly = update.Value == "True" ? true : false;
+                    animalToUpdate.PetFriendly = petFriendly;
+                }
+                else if (update.Key == 7)
+                {
+                    int weight = Convert.ToInt32(update.Value);
+                    animalToUpdate.Weight = weight;
+                }
+                else if (update.Key == 8)
+                {
+                    int animalId = Convert.ToInt32(update.Value);
+                    animalToUpdate.DietPlanId = 1;
+                    // Update/Figure out tomorrow
+                }
+            }
+        }
     }
 }
