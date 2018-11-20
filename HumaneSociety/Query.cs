@@ -189,5 +189,54 @@ namespace HumaneSociety
                 Console.WriteLine("Error!");
             }
         }
+        internal static IQueryable<Animal> SearchForAnimalByMultipleTraits(Dictionary<int, string> searchCriteria)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<Animal> animals = db.Animals;
+            foreach (KeyValuePair<int, string> criteria in searchCriteria)
+            {
+
+                if (criteria.Key == 1)
+                {
+                    int categoryId = GetCategoryId(criteria.Value);
+                    animals = animals.Where(c => c.CategoryId == categoryId);
+                }
+                else if (criteria.Key == 2)
+                {
+                    animals = animals.Where(n => n.Name == criteria.Value);
+                }
+                else if (criteria.Key == 3)
+                {
+                    int age = Convert.ToInt32(criteria.Value);
+                    animals = animals.Where(a => a.Age == age);
+                }
+                else if (criteria.Key == 4)
+                {
+                    animals = animals.Where(d => d.Demeanor == criteria.Value);
+                }
+                else if (criteria.Key == 5)
+                {
+                    bool kidFriendly = criteria.Value == "True" ? true : false;
+                    animals = animals.Where(k => k.KidFriendly == kidFriendly);
+                }
+                else if (criteria.Key == 6)
+                {
+                    bool petFriendly = criteria.Value == "True" ? true : false;
+                    animals = animals.Where(p => p.PetFriendly == petFriendly);
+                }
+                else if (criteria.Key == 7)
+                {
+                    int weight = Convert.ToInt32(criteria.Value);
+                    animals = animals.Where(w => w.Weight == weight);
+                }
+                else if (criteria.Key == 8)
+                {
+                    int animalId = Convert.ToInt32(criteria.Value);
+                    animals = animals.Where(a => a.AnimalId == animalId);
+                }
+
+            }
+            return animals;
+        }
     }
 }
