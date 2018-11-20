@@ -254,6 +254,8 @@ namespace HumaneSociety
             animal.Demeanor = UserInterface.GetStringData("demeanor", "the animal's");
             animal.KidFriendly = UserInterface.GetBitData("the animal", "child friendly");
             animal.PetFriendly = UserInterface.GetBitData("the animal", "pet friendly");
+            animal.Gender = UserInterface.GetStringData("the animal", "the gender of the");
+            animal.AdoptionStatus = "AVAILABLE";
             animal.Weight = UserInterface.GetIntegerData("the animal", "the weight of the");
             string dietPlan = UserInterface.GetStringData("the animal", "the diet plan of the");
             animal.DietPlanId = Query.GetDietPlanId(dietPlan);

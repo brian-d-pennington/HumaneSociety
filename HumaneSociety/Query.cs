@@ -180,6 +180,14 @@ namespace HumaneSociety
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
 
             db.Animals.InsertOnSubmit(animal);
+            try
+            {
+                db.SubmitChanges();
+            }
+            catch
+            {
+                Console.WriteLine("Error!");
+            }
         }
     }
 }
