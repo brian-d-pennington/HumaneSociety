@@ -325,5 +325,35 @@ namespace HumaneSociety
             db.Adoptions.InsertOnSubmit(adoption);
             db.SubmitChanges();
         }
+
+        internal static Room GetRoom(int animalId)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            return db.Rooms.Where(r => r.AnimalId == animalId).Single();
+        }
+
+        internal static void RunEmployeeQueries(Employee employee, string thisCase)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+
+            switch (thisCase)
+            {
+                case "create":
+                    db.Employees.InsertOnSubmit(employee);
+                    db.SubmitChanges();
+                    break;
+                case "read":
+                    break;
+                case "update":
+                    break;
+                case "delete":
+                    var employeeToDelete = db.Employees.Where(e => e.LastName == employee.LastName).Single();
+                    db.Employees.DeleteOnSubmit(employeeToDelete);
+                    db.SubmitChanges();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
