@@ -59,7 +59,7 @@ namespace HumaneSociety
                 newAddress.Zipcode = zipCode;
                 newAddress.USStateId = stateId;
 
-                db.Addresses.Add(newAddress);
+                db.Addresses.InsertOnSubmit(newAddress);
                 db.SubmitChanges();
 
                 addressFromDb = newAddress;
@@ -68,7 +68,7 @@ namespace HumaneSociety
             // attach AddressId to clientFromDb.AddressId
             newClient.AddressId = addressFromDb.AddressId;
 
-            db.Clients.Add(newClient);
+            db.Clients.InsertOnSubmit(newClient);
 
             db.SubmitChanges();
         }
@@ -102,7 +102,7 @@ namespace HumaneSociety
                 newAddress.Zipcode = clientAddress.Zipcode;
                 newAddress.USStateId = clientAddress.USStateId;
 
-                db.Addresses.Add(newAddress);
+                db.Addresses.InsertOnSubmit(newAddress);
                 db.SubmitChanges();
 
                 updatedAddress = newAddress;
@@ -237,6 +237,26 @@ namespace HumaneSociety
 
             }
             return animals;
+        }
+
+        internal static void RemoveAnimal(Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+
+            var selectedAnimal = db.Animals.Where(a => a.AnimalId == animal.AnimalId).FirstOrDefault();
+            if (selectedAnimal != null)
+            {
+                db.Animals.DeleteOnSubmit(selectedAnimal);
+                db.SubmitChanges();
+            }
+        }
+
+        internal static IQueryable<AnimalShot> GetShots(Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<AnimalShot> animalShots = db.AnimalShots;
+            animalShots = animalShots.Where(a => a.AnimalId == animal.AnimalId);
+            return animalShots;
         }
     }
 }
