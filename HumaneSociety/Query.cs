@@ -312,5 +312,18 @@ namespace HumaneSociety
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
             return db.Animals.Where(a => a.AnimalId == ID).Single();
         }
+
+        internal static void Adopt(Animal animal, Client client)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Adoption adoption = new Adoption();
+            adoption.ClientId = client.ClientId;
+            adoption.AnimalId = animal.AnimalId;
+            adoption.ApprovalStatus = "PENDING";
+            adoption.AdoptionFee = 75;
+            adoption.PaymentCollected = false;
+            db.Adoptions.InsertOnSubmit(adoption);
+            db.SubmitChanges();
+        }
     }
 }
