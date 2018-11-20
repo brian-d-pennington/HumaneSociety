@@ -258,5 +258,23 @@ namespace HumaneSociety
             animalShots = animalShots.Where(a => a.AnimalId == animal.AnimalId);
             return animalShots;
         }
+        internal static IQueryable<Adoption> GetPendingAdoptions()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<Adoption> pendingAdoptions = db.Adoptions;
+            pendingAdoptions = pendingAdoptions.Where(a => a.ApprovalStatus == "PENDING");
+            return pendingAdoptions;
+        }
+
+        internal static void UpdateAdoption(bool decision, Adoption adoption)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            string status = decision == true ? "APPROVED" : "PENDING";
+            adoption = (from x in db.Adoptions
+                        where x.AdoptionId == adoption.AdoptionId
+                        select x).First();
+            adoption.ApprovalStatus = status;
+            db.SubmitChanges();
+        }
     }
 }
