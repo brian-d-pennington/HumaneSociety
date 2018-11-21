@@ -91,7 +91,7 @@ namespace HumaneSociety
                 int dietPlanId = Convert.ToInt32(userInput);
                 UserInterface.DisplayAboutToUpdate();
                 DietPlan dietPlan = new DietPlan();
-                if (amountOfDietPlans < dietPlanId)
+                if (amountOfDietPlans >= dietPlanId)
                 {
                     dietPlan.Name = UserInterface.GetStringDataWithoutIs("set the name to", "would you like to");
                     dietPlan.FoodType = UserInterface.GetStringDataWithoutIs("set the food type to", "would you like to");

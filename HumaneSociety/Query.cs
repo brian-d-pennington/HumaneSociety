@@ -286,6 +286,7 @@ namespace HumaneSociety
             if (status == "APPROVED")
             {
                 adoption.PaymentCollected = true;
+                UpdateAnimalAdoptionStatus(adoption.AnimalId, "ADOPTED");
                 UpdateRoom(adoption.AnimalId);
             }
             db.SubmitChanges();
@@ -338,6 +339,7 @@ namespace HumaneSociety
             adoption.PaymentCollected = false;
             db.Adoptions.InsertOnSubmit(adoption);
             db.SubmitChanges();
+            UpdateAnimalAdoptionStatus(adoption.AnimalId, "PENDING");
         }
 
         internal static Room GetRoom(int animalId)
@@ -505,6 +507,27 @@ namespace HumaneSociety
             dietPlanToUpdate.Name = dietPlan.Name;
             dietPlanToUpdate.FoodType = dietPlan.FoodType;
             dietPlanToUpdate.FoodAmountInCups = dietPlan.FoodAmountInCups;
+            db.SubmitChanges();
+        }
+
+        internal static bool CheckIfAdopted(Animal animal)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Animal animalToCheck = db.Animals.Where(a => a.AnimalId == animal.AnimalId).Single();
+            if (animalToCheck.AdoptionStatus == "ADOPTED")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        internal static void UpdateAnimalAdoptionStatus(int? animalId, string status)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Animal animalToUpdate = db.Animals.Where(a => a.AnimalId == animalId).Single();
+            animalToUpdate.AdoptionStatus = status;
             db.SubmitChanges();
         }
     }
