@@ -239,7 +239,11 @@ namespace HumaneSociety
                     int animalId = Convert.ToInt32(criteria.Value);
                     animals = animals.Where(a => a.AnimalId == animalId);
                 }
-
+                else if (criteria.Key == 9)
+                {
+                    int dietPlan = GetDietPlanId(criteria.Value);
+                    animals = animals.Where(a => a.DietPlanId == dietPlan);
+                }
             }
             return animals;
         }
@@ -279,11 +283,12 @@ namespace HumaneSociety
                         where x.AdoptionId == adoption.AdoptionId
                         select x).First();
             adoption.ApprovalStatus = status;
-            db.SubmitChanges();
             if (status == "APPROVED")
             {
+                adoption.PaymentCollected = true;
                 UpdateRoom(adoption.AnimalId);
             }
+            db.SubmitChanges();
         }
         internal static void GiveShot(Animal animal)
         {
@@ -341,7 +346,7 @@ namespace HumaneSociety
             return db.Rooms.Where(r => r.AnimalId == animalId).Single();
         }
 
-        internal static void RunEmployeeQueries(Employee employee, string thisCase)
+        internal static void RunEmployeeQueries(Employee employee, string thisCase, int employeeNumToUpdate = 0)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
 
@@ -352,19 +357,21 @@ namespace HumaneSociety
                     db.SubmitChanges();
                     break;
                 case "read":
-                    UserInterface.DisplayEmployeeInfo(employee);
+                    Employee employeeToRead = db.Employees.Where(e => e.EmployeeNumber == employee.EmployeeNumber).Single();
+                    UserInterface.DisplayEmployeeInfo(employeeToRead);
                     break;
                 case "update":
                     Employee employeeToUpdate = new Employee();
                     employeeToUpdate = (from e in db.Employees
-                                        where e.EmployeeNumber == employee.EmployeeNumber
+                                        where e.EmployeeNumber == employeeNumToUpdate
                                         select e).Single();
                     employeeToUpdate.FirstName = employee.FirstName;
                     employeeToUpdate.LastName = employee.LastName;
                     employeeToUpdate.Email = employee.Email;
+                    db.SubmitChanges();
                     break;
                 case "delete":
-                    var employeeToDelete = db.Employees.Where(e => e.LastName == employee.LastName).Single();
+                    Employee employeeToDelete = db.Employees.Where(e => e.LastName == employee.LastName).Single();
                     db.Employees.DeleteOnSubmit(employeeToDelete);
                     db.SubmitChanges();
                     break;
@@ -414,11 +421,10 @@ namespace HumaneSociety
                     int weight = Convert.ToInt32(update.Value);
                     animalToUpdate.Weight = weight;
                 }
-                else if (update.Key == 8)
+                else if (update.Key == 9)
                 {
-                    int animalId = Convert.ToInt32(update.Value);
-                    animalToUpdate.DietPlanId = 1;
-                    // Update/Figure out tomorrow
+                    int dietPlanId = Convert.ToInt32(update.Value);
+                    animalToUpdate.DietPlanId =  dietPlanId;
                 }
             }
         }
@@ -462,11 +468,43 @@ namespace HumaneSociety
             db.SubmitChanges();
             SetAnimalRoom();
         }
-        internal static void UpdateRoom(int animalId)
+        internal static void UpdateRoom(int? animalId)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
             Room room = db.Rooms.Where(r => r.AnimalId == animalId).Single();
             room.AnimalId = null;
+            db.SubmitChanges();
+        }
+        internal static string CreateDietPlan()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            DietPlan dietPlan = new DietPlan();
+            dietPlan.Name = UserInterface.GetStringData("name", "the diet plan");
+            dietPlan.FoodType = UserInterface.GetStringData("food type", "the diet plan");
+            dietPlan.FoodAmountInCups = UserInterface.GetIntegerData("the diet plan", "food amount in cups of");
+            db.DietPlans.InsertOnSubmit(dietPlan);
+            db.SubmitChanges();
+            return dietPlan.Name;
+        }
+        internal static int DisplayAndCountAllDietPlans()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<DietPlan> dietPlans = db.DietPlans;
+            int i = 1;
+            foreach (DietPlan dietPlan in dietPlans)
+            {
+                Console.WriteLine(i + ". " + dietPlan.Name);
+                i++;
+            }
+            return i;
+        }
+        internal static void UpdateDietPlan(DietPlan dietPlan, int dietPlanIdNum)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            DietPlan dietPlanToUpdate = db.DietPlans.Where(d => d.DietPlanId == dietPlanIdNum).Single();
+            dietPlanToUpdate.Name = dietPlan.Name;
+            dietPlanToUpdate.FoodType = dietPlan.FoodType;
+            dietPlanToUpdate.FoodAmountInCups = dietPlan.FoodAmountInCups;
             db.SubmitChanges();
         }
     }

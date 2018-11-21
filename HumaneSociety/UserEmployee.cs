@@ -26,7 +26,7 @@ namespace HumaneSociety
         }
         protected override void RunUserMenus()
         {
-            List<string> options = new List<string>() { "What would you like to do? (select number of choice)", "1. Add animal", "2. Remove Anmial", "3. Check Animal Status",  "4. Approve Adoption" };
+            List<string> options = new List<string>() { "What would you like to do? (select number of choice)", "1. Add animal", "2. Remove Anmial", "3. Check Animal Status",  "4. Approve Adoption", "5. Update"};
             UserInterface.DisplayUserOptions(options);
             string input = UserInterface.GetUserInput();
             RunUserInput(input);
@@ -51,10 +51,66 @@ namespace HumaneSociety
                     CheckAdoptions();
                     RunUserMenus();
                     return;
+                case "5":
+                    UpdateOptions();
+                    RunUserMenus();
+                    return;
                 default:
                     UserInterface.DisplayUserOptions("Input not accepted please try again");
                     RunUserMenus();
                     return;
+            }
+        }
+        private void UpdateOptions()
+        {
+            Console.Clear();
+            List<string> options = new List<string>() { "What would you like to do? (select number of choice)", "1. Diet Plan", "2. Main menu" };
+            UserInterface.DisplayUserOptions(options);
+            string input = UserInterface.GetUserInput();
+            switch (input)
+            {
+                case "1":
+                    UpdateDietPlan();
+                    break;
+                case "2":
+                    RunUserMenus();
+                    return;
+                default:
+                    UserInterface.DisplayUserOptions("Input not accepted please try again");
+                    UpdateOptions();
+                    return;
+            }
+        }
+        private void UpdateDietPlan()
+        {
+            Console.WriteLine("What diet plan would you like to change?");
+            int amountOfDietPlans = Query.DisplayAndCountAllDietPlans();
+            string userInput = Console.ReadLine();
+            try
+            {
+                int dietPlanId = Convert.ToInt32(userInput);
+                UserInterface.DisplayAboutToUpdate();
+                DietPlan dietPlan = new DietPlan();
+                if (amountOfDietPlans < dietPlanId)
+                {
+                    dietPlan.Name = UserInterface.GetStringDataWithoutIs("set the name to", "would you like to");
+                    dietPlan.FoodType = UserInterface.GetStringDataWithoutIs("set the food type to", "would you like to");
+                    dietPlan.FoodAmountInCups = int.Parse(UserInterface.GetStringData("you would like to set for this diet plan", "amount of food in cups"));
+                    Query.UpdateDietPlan(dietPlan, dietPlanId);
+                    return;
+                }
+                else
+                {
+                    UserInterface.DisplayUserOptions("Input not accepted please try again");
+                    UpdateDietPlan();
+                    return;
+                }
+            }
+            catch
+            {
+                UserInterface.DisplayUserOptions("Input not accepted please try again");
+                UpdateDietPlan();
+                return;
             }
         }
 
@@ -187,7 +243,7 @@ namespace HumaneSociety
             {
                 updates = new Dictionary<int, string>();
             }
-            List<string> options = new List<string>() { "Select Updates: (Enter number and choose finished when finished)", "1. Category", "2. Name", "3. Age", "4. Demeanor", "5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Diet Plan" }; // Figure out today!
+            List<string> options = new List<string>() { "Select Updates: (Enter number and choose finished when finished)", "1. Category", "2. Name", "3. Age", "4. Demeanor", "5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Diet Plan", "9. Finished" }; // Figure out today!
             UserInterface.DisplayUserOptions(options);
             string input = UserInterface.GetUserInput();
             if(input.ToLower() == "9" ||input.ToLower() == "finished")
@@ -196,6 +252,7 @@ namespace HumaneSociety
             }
             else
             {
+                input = input == "8" ? "9" : input;
                 updates = UserInterface.EnterSearchCriteria(updates, input);
                 UpdateAnimal(animal);
             }
@@ -259,7 +316,15 @@ namespace HumaneSociety
             animal.Gender = UserInterface.GetStringData("the animal", "the gender of the");
             animal.AdoptionStatus = "AVAILABLE";
             animal.Weight = UserInterface.GetIntegerData("the animal", "the weight of the");
-            string dietPlan = UserInterface.GetStringData("the animal", "the diet plan of the");
+            string dietPlan;
+            if (UserInterface.GetBitData("Would you like create a new diet plan?"))
+            {
+                dietPlan = Query.CreateDietPlan();
+            }
+            else
+            {
+                dietPlan = UserInterface.GetStringData("the animal", "the diet plan of the");
+            }
             animal.DietPlanId = Query.GetDietPlanId(dietPlan);
             Query.AddAnimal(animal);
         }

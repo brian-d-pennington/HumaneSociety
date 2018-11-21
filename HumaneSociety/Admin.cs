@@ -12,7 +12,7 @@ namespace HumaneSociety
         {
             UserInterface.DisplayUserOptions("What is your password?");
             string password = UserInterface.GetUserInput();
-            if (password.ToLower() != "poiuyt")
+            if (password.ToLower() != "adminpass")
             {
                 UserInterface.DisplayUserOptions("Incorrect password please try again or type exit");
             }
@@ -25,7 +25,7 @@ namespace HumaneSociety
         protected override void RunUserMenus()
         {
             Console.Clear();
-            List<string> options = new List<string>() { "Admin log in successful.", "What would you like to do?", "1. Create new employee", "2. Delete employee", "3. Read employee info ", "4. Update emplyee info", "(type 1, 2, 3, 4,  create, read, update, or delete)" };
+            List<string> options = new List<string>() { "Admin log in successful.", "What would you like to do?", "1. Create new employee", "2. Delete employee", "3. Read employee info ", "4. Update emplyee info", "(type 1, 2, 3, 4,  create, delete, read, or update)" };
             UserInterface.DisplayUserOptions(options);
             string input = UserInterface.GetUserInput();
             RunInput(input);
@@ -62,13 +62,15 @@ namespace HumaneSociety
         private void UpdateEmployee()
         {
             Employee employee = new Employee();
+            int employeeNumber = int.Parse(UserInterface.GetStringData("employee number you would like to change", "the employee's"));
+            UserInterface.DisplayAboutToUpdate();
             employee.FirstName = UserInterface.GetStringData("first name", "the employee's");
             employee.LastName = UserInterface.GetStringData("last name", "the employee's");
-            employee.EmployeeId = int.Parse(UserInterface.GetStringData("employee number", "the employee's"));
+            employeeNumber = int.Parse(UserInterface.GetStringData("employee number", "the employee's"));
             employee.Email = UserInterface.GetStringData("email", "the employee's");
             try
             {
-                Query.RunEmployeeQueries(employee, "update");
+                Query.RunEmployeeQueries(employee, "update", employeeNumber);
                 UserInterface.DisplayUserOptions("Employee update successful.");
             }
             catch
@@ -119,6 +121,8 @@ namespace HumaneSociety
             Employee employee = new Employee();
             employee.FirstName = UserInterface.GetStringData("first name", "the employee's");
             employee.LastName = UserInterface.GetStringData("last name", "the employee's");
+            employee.UserName = UserInterface.GetStringData("username", "the employee's");
+            employee.Password = UserInterface.GetStringData("password", "the employee's");
             employee.EmployeeNumber = int.Parse(UserInterface.GetStringData("employee number", "the employee's"));
             employee.Email = UserInterface.GetStringData("email", "the employee's"); ;
             try
