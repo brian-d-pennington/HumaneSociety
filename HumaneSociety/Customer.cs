@@ -79,14 +79,33 @@ namespace HumaneSociety
             Console.Clear();
             UserInterface.DisplayUserOptions("Please enter the ID of the animal you wish to adopt or type reset or exit");
             int iD = UserInterface.GetIntegerData();
-            var animal = Query.GetAnimalByID(iD);
-            UserInterface.DisplayAnimalInfo(animal);
-            UserInterface.DisplayUserOptions("Would you like to adopt?");
-            if ((bool)UserInterface.GetBitData())
+            List<int?> animalIds = Query.GetAllAdoptedAnimals();
+            bool isAdopted = false;
+            foreach (int? id in animalIds)
             {
-                Query.Adopt(animal, client);
-                UserInterface.DisplayUserOptions("Adoption request sent we will hold $75 adoption fee until processed");
+                if (id == iD)
+                {
+                    isAdopted = true;
+                }
             }
+            if (iD < Query.GetMaxAnimalId() && isAdopted == false)
+            {
+                var animal = Query.GetAnimalByID(iD);
+                UserInterface.DisplayAnimalInfo(animal);
+                UserInterface.DisplayUserOptions("Would you like to adopt?");
+                if ((bool)UserInterface.GetBitData())
+                {
+                    Query.Adopt(animal, client);
+                    UserInterface.DisplayUserOptions("Adoption request sent we will hold $75 adoption fee until processed");
+                }
+            }
+            else
+            {
+                UserInterface.DisplayUserOptions("Input not accepted please try again");
+                ApplyForAdoption();
+                return;
+            }
+
         }
 
         private void RunSearch()

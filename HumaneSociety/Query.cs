@@ -322,12 +322,17 @@ namespace HumaneSociety
                 db.SubmitChanges();
             }
         }
+
         internal static Animal GetAnimalByID(int ID)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
             return db.Animals.Where(a => a.AnimalId == ID).Single();
         }
-
+        internal static int GetMaxAnimalId()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            return db.Animals.Max(a => a.AnimalId);
+        }
         internal static void Adopt(Animal animal, Client client)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
@@ -529,6 +534,17 @@ namespace HumaneSociety
             Animal animalToUpdate = db.Animals.Where(a => a.AnimalId == animalId).Single();
             animalToUpdate.AdoptionStatus = status;
             db.SubmitChanges();
+        }
+        internal static List<int?> GetAllAdoptedAnimals()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            List<int?> animalIds = new List<int?>();
+            IQueryable<Adoption> animalsAdopted = db.Adoptions;
+            foreach (Adoption animal in animalsAdopted)
+            {
+                animalIds.Add(animal.AnimalId);
+            }
+            return animalIds;
         }
     }
 }
