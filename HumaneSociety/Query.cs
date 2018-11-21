@@ -183,16 +183,21 @@ namespace HumaneSociety
             try
             {
                 db.SubmitChanges();
+                SetAnimalRoom();
             }
             catch
             {
                 Console.WriteLine("Error!");
             }
         }
-        internal static IQueryable<Animal> SearchForAnimalByMultipleTraits(Dictionary<int, string> searchCriteria)
+        internal static IQueryable<Animal> SearchForAnimalByMultipleTraits(Dictionary<int, string> searchCriteria, string user)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
             IQueryable<Animal> animals = db.Animals;
+            if (user == "Customer")
+            {
+                animals = animals.Where(a => a.AdoptionStatus != "ADOPTED");
+            }
             foreach (KeyValuePair<int, string> criteria in searchCriteria)
             {
 
@@ -275,6 +280,10 @@ namespace HumaneSociety
                         select x).First();
             adoption.ApprovalStatus = status;
             db.SubmitChanges();
+            if (status == "APPROVED")
+            {
+                UpdateRoom(adoption.AnimalId);
+            }
         }
         internal static void GiveShot(Animal animal)
         {
@@ -343,6 +352,7 @@ namespace HumaneSociety
                     db.SubmitChanges();
                     break;
                 case "read":
+                    UserInterface.DisplayEmployeeInfo(employee);
                     break;
                 case "update":
                     Employee employeeToUpdate = new Employee();
@@ -411,6 +421,53 @@ namespace HumaneSociety
                     // Update/Figure out tomorrow
                 }
             }
+        }
+        internal static void AddCategoryIfNull(string species)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<Category> categories = db.Categories;
+            foreach (Category category in categories)
+            {
+                if (category.Name == species)
+                {
+                    return;
+                }
+            }
+            Category categoryToInsert = new Category();
+            categoryToInsert.Name = species;
+            db.Categories.InsertOnSubmit(categoryToInsert);
+            db.SubmitChanges();
+        }
+        internal static void SetAnimalRoom()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            IQueryable<Room> rooms = db.Rooms;
+            foreach (Room room in rooms)
+            {
+                if (room.AnimalId == null)
+                {
+                    room.AnimalId = db.Animals.Max(a => a.AnimalId);
+                    db.SubmitChanges();
+                    return;
+                }
+            }
+            CreateNewRoom();
+        }
+        internal static void CreateNewRoom()
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Room room = new Room();
+            room.RoomNumber = db.Rooms.Max(r => r.RoomNumber) + 1;
+            db.Rooms.InsertOnSubmit(room);
+            db.SubmitChanges();
+            SetAnimalRoom();
+        }
+        internal static void UpdateRoom(int animalId)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            Room room = db.Rooms.Where(r => r.AnimalId == animalId).Single();
+            room.AnimalId = null;
+            db.SubmitChanges();
         }
     }
 }

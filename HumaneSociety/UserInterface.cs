@@ -121,7 +121,12 @@ namespace HumaneSociety
                 return GetIntegerData(parameter, target);
             }
         }
-
+        internal static void DisplayEmployeeInfo(Employee employee)
+        {
+            List<string> info = new List<string>() { employee.FirstName, employee.LastName, employee.Email, employee.EmployeeNumber.ToString() };
+            DisplayUserOptions(info);
+            Console.ReadLine();
+        }
         internal static void DisplayClientInfo(Client client)
         {
             List<string> info = new List<string>() { client.FirstName, client.LastName, client.Email, client.Address.USState.Name };
