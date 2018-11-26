@@ -64,7 +64,7 @@ namespace HumaneSociety
         private void UpdateOptions()
         {
             Console.Clear();
-            List<string> options = new List<string>() { "What would you like to do? (select number of choice)", "1. Diet Plan", "2. Main menu" };
+            List<string> options = new List<string>() { "What would you like to do? (select number of choice)", "1. Diet Plan", "2. Import Animals From File", "3. Return to Main Menu" };
             UserInterface.DisplayUserOptions(options);
             string input = UserInterface.GetUserInput();
             switch (input)
@@ -73,6 +73,9 @@ namespace HumaneSociety
                     UpdateDietPlan();
                     break;
                 case "2":
+                    ImportFromFile();
+                    return;
+                case "3":
                     RunUserMenus();
                     return;
                 default:
@@ -80,6 +83,26 @@ namespace HumaneSociety
                     UpdateOptions();
                     return;
             }
+        }
+        private void ImportFromFile()
+        {
+            Console.Clear();
+            Console.WriteLine("Example: C:'\'Program Files'\'... .csv");
+            string filePath = UserInterface.GetStringData("of the file you would like to import", "the path");
+            try
+            {
+                Query.InsertAllAnimalsFromFile(filePath, employee.EmployeeId);
+                Console.WriteLine("Successful file import! \nHit enter to continue.");
+                Console.ReadLine();
+                RunUserMenus();
+            }
+            catch
+            {
+                UserInterface.DisplayUserOptions("There was an error when attempting to import you file.");
+                UpdateOptions();
+
+            }
+
         }
         private void UpdateDietPlan()
         {
@@ -326,7 +349,7 @@ namespace HumaneSociety
                 dietPlan = UserInterface.GetStringData("the animal", "the diet plan of the");
             }
             animal.DietPlanId = Query.GetDietPlanId(dietPlan);
-            Query.AddAnimal(animal);
+            Query.AddAnimal(animal, employee.EmployeeId);
         }
         protected override void LogInPreExistingUser()
         {

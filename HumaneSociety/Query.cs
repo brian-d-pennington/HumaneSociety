@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ namespace HumaneSociety
 {
     public static class Query
     {
-
         internal static List<USState> GetStates()
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
@@ -135,7 +135,7 @@ namespace HumaneSociety
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
 
-            Employee employeeFromDb = db.Employees.Where(e => e.UserName == userName && e.Password == password).FirstOrDefault();
+            Employee employeeFromDb = db.Employees.Where(e => e.UserName == userName && e.Password == password).Single();
 
             return employeeFromDb;
         }
@@ -175,10 +175,10 @@ namespace HumaneSociety
             return db.DietPlans.Where(d => d.Name == dietPlan).Select(d => d.DietPlanId).Single();
         }
 
-        internal static void AddAnimal(Animal animal)
+        internal static void AddAnimal(Animal animal, int employeeId)
         {
             HumaneSocietyDataContext db = new HumaneSocietyDataContext();
-
+            animal.EmployeeId = employeeId;
             db.Animals.InsertOnSubmit(animal);
             try
             {
@@ -373,6 +373,7 @@ namespace HumaneSociety
                                         where e.EmployeeNumber == employeeNumToUpdate
                                         select e).Single();
                     employeeToUpdate.FirstName = employee.FirstName;
+                    employeeToUpdate.EmployeeNumber = employee.EmployeeNumber;
                     employeeToUpdate.LastName = employee.LastName;
                     employeeToUpdate.Email = employee.Email;
                     db.SubmitChanges();
@@ -545,6 +546,42 @@ namespace HumaneSociety
                 animalIds.Add(animal.AnimalId);
             }
             return animalIds;
+        }
+        internal static void InsertAllAnimalsFromFile(string filePath, int employeeId)
+        {
+            HumaneSocietyDataContext db = new HumaneSocietyDataContext();
+            List<string> stringData = new List<string>();
+            using (var reader = new StreamReader(@filePath))
+            {
+
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(';');
+
+                    stringData.Add(values[0]);
+                }
+            }
+            var data = stringData.Select(r => r.Split(',')).ToArray();
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                Animal animal = new Animal();
+                animal.Name = data[i][0];
+                animal.CategoryId = Convert.ToInt32(data[i][1]);
+                animal.Weight = Convert.ToInt32(data[i][2]);
+                animal.Age = Convert.ToInt32(data[i][3]);
+                animal.DietPlanId = Convert.ToInt32(data[i][4]);
+                animal.Demeanor = data[i][5];
+                animal.KidFriendly = data[i][6] == "TRUE" ? true : false;
+                animal.PetFriendly = data[i][7] == "TRUE" ? true : false;
+                animal.Gender = data[i][8];
+                animal.AdoptionStatus = "AVAILABLE";
+                animal.EmployeeId = employeeId;
+                db.Animals.InsertOnSubmit(animal);
+                db.SubmitChanges();
+                SetAnimalRoom();
+            }
         }
     }
 }
